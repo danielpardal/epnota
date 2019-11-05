@@ -12,6 +12,8 @@ class NfeControllerSpec extends Specification implements ControllerUnitTest<NfeC
 
         // TODO: Populate valid properties like...
         //params["name"] = 'someValidName'
+        params["accessKey"] = '123456'
+        params["totalInvoice"] = 987.65
         assert false, "TODO: Provide a populateValidParams() implementation for this generated test suite"
     }
 

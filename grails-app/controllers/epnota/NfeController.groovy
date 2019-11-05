@@ -30,12 +30,25 @@ class NfeController {
         respond "Valor Total da NFe":ret
     }
 
+    def cleanAllNfes() {
+        try {
+            Nfe.executeUpdate('delete from Nfe')
+            flash.message = message(code: 'default.okCleanAll.message', args: [message(code: 'nfe.label', default: 'Nfe')])
+        } catch (ValidationException e) {
+            println(e.message)
+            flash.message = message(code: 'default.errorCleanAll.message', args: [message(code: 'nfe.label', default: 'Nfe'), e.message])
+            return
+        }
+        redirect action: "index", method: "GET"
+    }
+
     def searchNfes() {
 
         def resp
         def cont = true
         def url = 'https://sandbox-api.arquivei.com.br/v1/nfe/received'
         def nfe
+        def i = 0;
 
         while(cont)
         {
@@ -69,7 +82,7 @@ class NfeController {
                         println(nfeu.access_key)
 
                         if(!nfe) {
-
+                            i++
                             nfe = new Nfe()
                             nfe.accessKey = nfeu.access_key
                             
@@ -91,20 +104,18 @@ class NfeController {
                                 vnf = 0
 
                             println(vnf)
-                            //BigDecimal bdVnf = vnf as BigDecimal
-                            //bdVnf
-                            //def totalInvoice = Float.parseFloat(formatter.format(vnf.text()))
-                            //println(totalInvoice)
+                            
                             nfe.totalInvoice = vnf as BigDecimal
 
                             nfe.save(flush:true)
                         }
                     }
                 }
+                flash.message = message(code: 'default.okApi.message', args: [message(code: 'nfe.label', default: 'Nfe'), resp.status, i])
             }
             else {
                 cont = false
-                flash.message = message(code: 'default.errorApi.message', args: [message(code: 'nfe.label', default: 'Nfe'), resp.status])
+                flash.message = message(code: 'default.errorApi.message', args: [message(code: 'nfe.label', default: 'Nfe'), resp.status, i])
             }
         }
 
